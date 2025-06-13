@@ -51,15 +51,49 @@
       instructions.style.display = 'flex';
     });
 
-    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
-    scene.add(light);
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
 
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(50, 100, 50);
+    scene.add(directionalLight);
+
+    // Ground
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(1000, 1000),
       new THREE.MeshPhongMaterial({ color: 0x555555 })
     );
     ground.rotation.x = -Math.PI / 2;
     scene.add(ground);
+
+    // NYC-style buildings grid
+    const buildingCountX = 20;
+    const buildingCountZ = 20;
+    const blockSize = 10;
+
+    for (let i = 0; i < buildingCountX; i++) {
+      for (let j = 0; j < buildingCountZ; j++) {
+        const height = Math.random() * 45 + 5;
+
+        const buildingGeometry = new THREE.BoxGeometry(6, height, 6);
+        const buildingMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
+        const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+
+        building.position.x = i * blockSize - (buildingCountX * blockSize) / 2;
+        building.position.y = height / 2;
+        building.position.z = j * blockSize - (buildingCountZ * blockSize) / 2;
+
+        scene.add(building);
+      }
+    }
+
+    // Rat placeholder cube
+    const ratGeometry = new THREE.BoxGeometry(1, 0.5, 1);
+    const ratMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+    const rat = new THREE.Mesh(ratGeometry, ratMaterial);
+    rat.position.set(0, 0.25, 0);
+    scene.add(rat);
 
     // Controls input
     const keys = {};
@@ -70,16 +104,25 @@
 
     function animate() {
       requestAnimationFrame(animate);
+
       if (controls.isLocked) {
         if (keys['w']) controls.moveForward(speed);
         if (keys['s']) controls.moveForward(-speed);
         if (keys['a']) controls.moveRight(-speed);
         if (keys['d']) controls.moveRight(speed);
       }
+
       renderer.render(scene, camera);
     }
 
     animate();
+
+    // Handle window resizing
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
