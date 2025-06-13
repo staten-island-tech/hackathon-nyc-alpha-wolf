@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>PointerLockControls Example</title>
+  <title>Rat in NYC (Test)</title>
   <style>
     body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
     #instructions {
       position: absolute;
       width: 100%;
@@ -15,37 +16,29 @@
       align-items: center;
       justify-content: center;
       font-size: 24px;
+      z-index: 10;
       cursor: pointer;
-      user-select: none;
     }
   </style>
 </head>
 <body>
-  <div id="instructions">Click to start (pointer lock)</div>
+  <div id="instructions">Click to start (you are the rat 🐀)</div>
+
   <script type="module">
     import * as THREE from './js/three.module.js';
     import { PointerLockControls } from './js/PointerLockControls.js';
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.y = 1.2;
+
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Add some light and a ground plane for reference
-    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
-    scene.add(light);
-
-    const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
-    const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x555555 });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    scene.add(ground);
-
-    // Setup PointerLockControls
     const controls = new PointerLockControls(camera, document.body);
-    const instructions = document.getElementById('instructions');
 
+    const instructions = document.getElementById('instructions');
     instructions.addEventListener('click', () => {
       controls.lock();
     });
@@ -58,7 +51,17 @@
       instructions.style.display = 'flex';
     });
 
-    // Movement keys
+    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+    scene.add(light);
+
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(1000, 1000),
+      new THREE.MeshPhongMaterial({ color: 0x555555 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
+
+    // Controls input
     const keys = {};
     document.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
     document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
@@ -77,13 +80,6 @@
     }
 
     animate();
-
-    // Resize handling
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth/window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
   </script>
 </body>
 </html>
